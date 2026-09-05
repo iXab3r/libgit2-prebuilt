@@ -1,0 +1,6 @@
+/build/
+/cache/
+/dist/
+/smoke/target/
+/smoke/native.toml
+*.log

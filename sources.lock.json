@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "packageVersion": "1.8.6-1",
+  "target": "x86_64-pc-windows-msvc",
+  "crt": "static",
+  "sources": [
+    {
+      "name": "zlib",
+      "version": "1.3.2",
+      "repository": "madler/zlib",
+      "commit": "da607da739fa6047df13e66a2af6b8bec7c2a498",
+      "sha256": "21de001766abb1f5bfdfb3c23aa42d30a6bbd7eddd37131d5e7fe89c5ec068f8"
+    },
+    {
+      "name": "libssh2",
+      "version": "1.11.1",
+      "repository": "libssh2/libssh2",
+      "commit": "a312b43325e3383c865a87bb1d26cb52e3292641",
+      "sha256": "8cb6763db103a7f6d44d9a7a88425ec935a40b35d3bf19b82eeadd72484870f2"
+    },
+    {
+      "name": "libgit2",
+      "version": "1.8.6",
+      "repository": "libgit2/libgit2",
+      "commit": "5853918c4c6a7b12f8becf4bd11ff4362ebb9020",
+      "sha256": "221eac1af405b413806d669eca31c38d409839ca4bf6b93d6ec08dd438da2aac"
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+name: Build and verify native bundle
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-2022
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Build static libraries
+        run: ./scripts/Build.ps1
+      - name: Test the exported bundle after relocation
+        run: |
+          $lock = Get-Content sources.lock.json -Raw | ConvertFrom-Json
+          $archive = "dist/libgit2-prebuilt-$($lock.packageVersion)-$($lock.target)-mt.zip"
+          Expand-Archive -LiteralPath $archive -DestinationPath 'build/relocated package'
+          ./scripts/Test.ps1 -Package 'build/relocated package'
+      - name: Upload release candidates
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: native-bundle
+          path: dist/*
+          if-no-files-found: error
+      - name: Upload build evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: build-evidence
+          path: |
+            build/*.log
+            build/*evidence.json
+            dist/build-evidence.json
+
+  publish:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: windows
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: native-bundle
+          path: dist
+      - name: Publish verified assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          expected="v$(jq -r .packageVersion sources.lock.json)"
+          test "$RELEASE_TAG" = "$expected"
+          cd dist
+          sha256sum --check SHA256SUMS
+          gh release create "$RELEASE_TAG" ./* --verify-tag --title "libgit2-prebuilt $RELEASE_TAG" --notes-file ../RELEASE.md

@@ -6,6 +6,8 @@ repository; consume the resulting libraries without running the native Cargo bui
 The first package targets **Windows x64 / MSVC / static CRT (`/MT`)**. It preserves HTTPS and
 SSH support and does not require a system Git executable. Other platforms are not yet published.
 
+Contributor and agent guidance: [AGENTS.md](AGENTS.md).
+
 ## Package contract
 
 | Component | Version | Configuration |
